@@ -28,38 +28,86 @@ class ANPRApp(QMainWindow):
         self.showFullScreen()
 
         dark_theme = """
-QMainWindow {
-    background: #f2f2f2;
-    color: #000000;
-    border: 2px solid #d9d9d9;
-    border-radius: 10px;
-}
+        QMainWindow {
+            background: #f2f2f2;
+            color: #000000;
+            border: 2px solid #d9d9d9;
+            border-radius: 10px;
+        }
 
-QPushButton {
-    background: #4d94ff;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 20px;
-    padding: 10px 20px;
-    margin: 5px;
-}
+        QPushButton {
+            color: #FFFFFF;
+            border: none;
+            border-radius: 10px;
+            width: 100px;  /* Adjust width */
+            height: 100px;  /* Adjust height */
+            margin: 5px;
+        }
 
-QPushButton:hover {
-    background: #1a75ff;
-}
+        QPushButton#in_button,
+        QPushButton#out_button {
+            width: 80px;  /* Adjust width */
+            height: 80px;  /* Adjust height */
+        }
 
-QListWidget {
-    background: #f2f2f2;
-    border: 1px solid #d9d9d9;
-    color: #000000;
-    border-radius: 10px;
-}
+        QPushButton#in_button {
+            background: #4CAF50; /* Green */
+        }
 
-QLabel {
-    color: #000000;
-    border-radius: 10px; /* Add border-radius for rounding edges */
-    border: 2px solid #d9d9d9; /* Add border for better visibility */
-}
+
+        QPushButton#out_button {
+            background: #F44336; /* Red */
+        }
+
+
+        QPushButton:hover {
+            opacity: 0.8;
+        }
+
+                QTabWidget::pane {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                                stop:0 white, stop:1 lightgreen);
+                    border: 2px solid #d9d9d9;
+                    border-radius: 10px;
+                }
+
+                QTabBar::tab {
+                    background-color: #f9f9f9;
+                    border: 1px solid #d9d9d9;
+                    border-bottom-color: none;
+                    border-top-left-radius: 10px;
+                    border-top-right-radius: 10px;
+                    min-width: 100px;
+                    padding: 10px;
+                    margin-top: 10px;
+                    margin-bottom: -1px;
+                }
+
+                QTabBar::tab:selected {
+                    background-color: lightgreen;
+                    border: 2px solid #d9d9d9;
+                    border-bottom-color: none;
+                    border-top-left-radius: 10px;
+                    border-top-right-radius: 10px;
+                }
+
+        QListWidget {
+            background: #f9f9f9; /* Lighter gray background */
+            border: 1px solid #d9d9d9;
+            color: #000000;
+            border-radius: 10px;
+        }
+        QPushButton#quit_button { /* Added styling for the Quit button */
+            background: #607D8B; /* Grey-blue */
+            width: 80px;  /* Adjust width */
+            height: 80px;  /* Adjust height */
+        }
+
+        QLabel {
+            color: #000000;
+            border-radius: 10px; /* Add border-radius for rounding edges */
+            border: 2px solid #d9d9d9; /* Add border for better visibility */
+        }
         """
         self.setStyleSheet(dark_theme)
 
@@ -75,7 +123,7 @@ QLabel {
 
         side_layout = QVBoxLayout()
 
-        self.label_title = QLabel("PLAKALAR")
+        self.label_title = QLabel("PARS")
         self.label_title.setAlignment(Qt.AlignCenter)
         font_title = QFont("Arial", 24, QFont.Bold)
         self.label_title.setFont(font_title)
@@ -88,7 +136,7 @@ QLabel {
         # Create a list widget for CARSIN
         self.list_carsin = QListWidget()
         self.list_carsin.setStyleSheet(
-            "QListWidget { background: #2E2E2E; border: 10px solid #404040; color: #FFFFFF; }"
+            "QListWidget { background: #f2f2f2; border: none; color: #000000; }"
         )
         self.list_carsin.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -101,7 +149,7 @@ QLabel {
         # Create a list widget for CARS INSIDE
         self.list_carsinside = QListWidget()
         self.list_carsinside.setStyleSheet(
-            "QListWidget { background: #2E2E2E; border: 10px solid #404040; color: #FFFFFF; }"
+            "QListWidget { background: #f2f2f2; border: none; color: #000000; }"
         )
         self.list_carsinside.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -114,7 +162,7 @@ QLabel {
         # Create a list widget for CARSOUT
         self.list_carsout = QListWidget()
         self.list_carsout.setStyleSheet(
-            "QListWidget { background: #2E2E2E; border: 10px solid #404040; color: #FFFFFF; }"
+            "QListWidget { background: #f2f2f2; border: none; color: #000000; }"
         )
         self.list_carsout.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -141,15 +189,19 @@ QLabel {
         self.label_most_confident.setAlignment(Qt.AlignTop | Qt.AlignCenter)
         side_layout.addWidget(self.label_most_confident)
 
-        # Add "IN" button
+        # Add "IN" and "OUT" buttons side by side
+        buttons_layout = QHBoxLayout()
         in_button = QPushButton("IN")
+        in_button.setObjectName("in_button")
         in_button.clicked.connect(self.handleInButton)
-        side_layout.addWidget(in_button)
+        buttons_layout.addWidget(in_button)
 
-        # Add "OUT" button
         out_button = QPushButton("OUT")
+        out_button.setObjectName("out_button")
         out_button.clicked.connect(self.handleOutButton)
-        side_layout.addWidget(out_button)
+        buttons_layout.addWidget(out_button)
+
+        side_layout.addLayout(buttons_layout)
 
         self.list_carsin.itemClicked.connect(self.showImage)
         self.list_carsinside.itemClicked.connect(self.showImage)
@@ -158,6 +210,7 @@ QLabel {
         layout.addLayout(side_layout, 0, 1)
 
         quit_button = QPushButton("Quit")
+        quit_button.setObjectName("quit_button")  # Set object name for the Quit button
         exit_icon_path = "C:/Users/Onur/Desktop/ANPR/exit_icon.png"
         quit_button.setIcon(QIcon(exit_icon_path))
         quit_button.clicked.connect(self.quitApp)
@@ -176,9 +229,20 @@ QLabel {
 
     def handleInButton(self):
         self.video_thread.plate_in_out_signal.emit("IN")
+        # Change background color temporarily
+        self.highlightButton("in_button")
 
     def handleOutButton(self):
         self.video_thread.plate_in_out_signal.emit("OUT")
+        # Change background color temporarily
+        self.highlightButton("out_button")
+
+    def highlightButton(self, button_name):
+        button = self.findChild(QPushButton, button_name)
+        original_style_sheet = button.styleSheet()
+        highlighted_style_sheet = original_style_sheet + "border: 2px solid yellow;"
+        button.setStyleSheet(highlighted_style_sheet)
+        QTimer.singleShot(100, lambda: button.setStyleSheet(original_style_sheet))
 
     def updateFrame(self):
         ret, frame = self.video_thread.cap.read()
@@ -193,6 +257,8 @@ QLabel {
         pixmap = QPixmap.fromImage(qImg)
         self.label.setPixmap(pixmap)
 
+
+
     def updateMostConfidentPlate(self, plate, screenshot, plate_img):
         font = QFont("Arial", 18)
         self.label_most_confident.setFont(font)
@@ -202,10 +268,8 @@ QLabel {
         if any(c.islower() for c in plate_text):
             plate_text = plate_text.upper()
 
-        current_time = QTime.currentTime().toString("hh:mm:ss")
-        current_date = QDate.currentDate().toString(Qt.DefaultLocaleLongDate)
-
-        plate_with_datetime = f"{current_date} {current_time} - PLAKA: {plate_text}"
+        current_date_time = datetime.now().strftime("%m.%d.%Y %H:%M:%S")
+        plate_with_datetime = f"{current_date_time} - PLAKA: {plate_text}"
 
         self.label_most_confident.setText(plate_with_datetime)
         self.list_carsin.addItem(f" {plate_with_datetime}")
